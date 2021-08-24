@@ -1,0 +1,26 @@
+文件说明
+
+node_modules
+	所有官方安装的模块或者是外部引入安装的模块都在这里(这个文件夹基本不理)
+
+public
+	根目录，存放小图标ico文件和主显示HTML页面index.html、外部资源的
+
+src
+	存放开发文件的文件夹
+
+src ----> assets
+	存放开发时用到的图片
+
+src ----> components
+	存放自己写的共用组件(能被反复利用或则说是能被多个界面引用的组件)
+
+src ----> router
+	路由文件index.js存放的地方
+
+src ----> store
+	vuex中央管理器文件index.js存放的地方
+
+src ----> views
+	我们自己写的页面视图组件存放的地方，也就是我们app可视的界面的文件就存这里
+
