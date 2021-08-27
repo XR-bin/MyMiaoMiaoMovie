@@ -4,80 +4,26 @@
       <div class="city_hot">
         <h2>热门城市</h2>
         <ul class="clearfix">
-          <li>上海</li>
-          <li>北京</li>
-          <li>上海</li>
-          <li>北京</li>
-          <li>上海</li>
-          <li>北京</li>
-          <li>上海</li>
-          <li>北京</li>
+          <li v-for="item in hotList" :key="item.id">{{ item.nm }}</li>
         </ul>
       </div>
-      <div class="city_sort">
-        <div>
-          <h2>A</h2>
+      <div class="city_sort" ref="city_sort">
+        <div v-for="item in cityList" :key="item.index">
+          <h2>{{ item.index }}</h2>
           <ul>
-            <li>阿拉善盟</li>
-            <li>鞍山</li>
-            <li>安庆</li>
-            <li>安阳</li>
-          </ul>
-        </div>
-        <div>
-          <h2>B</h2>
-          <ul>
-            <li>北京</li>
-            <li>保定</li>
-            <li>蚌埠</li>
-            <li>包头</li>
-          </ul>
-        </div>
-        <div>
-          <h2>A</h2>
-          <ul>
-            <li>阿拉善盟</li>
-            <li>鞍山</li>
-            <li>安庆</li>
-            <li>安阳</li>
-          </ul>
-        </div>
-        <div>
-          <h2>B</h2>
-          <ul>
-            <li>北京</li>
-            <li>保定</li>
-            <li>蚌埠</li>
-            <li>包头</li>
-          </ul>
-        </div>
-        <div>
-          <h2>A</h2>
-          <ul>
-            <li>阿拉善盟</li>
-            <li>鞍山</li>
-            <li>安庆</li>
-            <li>安阳</li>
-          </ul>
-        </div>
-        <div>
-          <h2>B</h2>
-          <ul>
-            <li>北京</li>
-            <li>保定</li>
-            <li>蚌埠</li>
-            <li>包头</li>
+            <li v-for="itemList in item.list" :key="itemList.id">
+              {{ itemList.nm }}
+            </li>
           </ul>
         </div>
       </div>
     </div>
+
     <div class="city_index">
       <ul>
-        <li>A</li>
-        <li>B</li>
-        <li>C</li>
-        <li>D</li>
-        <li>E</li>
+        <li v-for="(item, index) in cityList" :key="item.index" @touchstart="toIndexHandler(index)">
+          {{ item.index }}
+        </li>
       </ul>
     </div>
   </div>
@@ -85,7 +31,68 @@
 
 <script>
 export default {
-  name: "City"
+  name: "City",
+
+  data() {
+    return {
+      cityList: [],
+      hotList: []
+    }
+  },
+
+  mounted() {
+    this.axios.get('/dianying/cities.json').then(
+      res => {
+        var { cityList, hotList } = this.formatCityList(res.data.cts)
+
+        this.cityList = cityList
+        this.hotList = hotList
+      })
+  },
+
+  methods: {
+    formatCityList(cities) {
+      var cityList = []
+      var hotList = []
+
+      hotList.push(cities[1], cities[0], cities[2], cities[3], cities[13], cities[5], cities[4], cities[10], cities[9], cities[12], cities[7])
+
+      for (let i = 0; i < cities.length; i++) {
+        var firstLetter = cities[i].py.substr(0, 1).toUpperCase()
+        if (toCom(firstLetter)) {
+          cityList.push({ index: firstLetter, list: [{ nm: cities[i].nm, id: cities[i].id }] })
+        } else {
+          for (let j = 0; j < cityList.length; j++) {
+            if (cityList[j].index === firstLetter) {
+              cityList[j].list.push({ nm: cities[i].nm, id: cities[i].id })
+            }
+          }
+        }
+      }
+
+      function toCom(firstLetter) {
+        for (let i = 0; i < cityList.length; i++) {
+          if (cityList[i].index === firstLetter) {
+            return false
+          }
+        }
+        return true
+      }
+
+      cityList.sort((a, b) => { return a.index.charCodeAt() - b.index.charCodeAt() })
+
+      return {
+        cityList,
+        hotList
+      }
+    },
+
+    toIndexHandler(index) {
+      var oH2 = this.$refs.city_sort.getElementsByTagName("h2")
+      this.$refs.city_sort.parentElement.scrollTop = oH2[index].offsetTop
+    }
+
+  }
 }
 </script>
 
