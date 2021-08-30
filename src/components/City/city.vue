@@ -1,23 +1,28 @@
 <template>
   <div class="city_body">
-    <div class="city_list">
-      <div class="city_hot">
-        <h2>热门城市</h2>
-        <ul class="clearfix">
-          <li v-for="item in hotList" :key="item.id">{{ item.nm }}</li>
-        </ul>
-      </div>
-      <div class="city_sort" ref="city_sort">
-        <div v-for="item in cityList" :key="item.index">
-          <h2>{{ item.index }}</h2>
-          <ul>
-            <li v-for="itemList in item.list" :key="itemList.id">
-              {{ itemList.nm }}
-            </li>
-          </ul>
+    <Loading v-if="isLoading" />
+    <Scroller v-else :isFinish="isFinish" ref="city_list">
+      <div>
+        <div class="city_list">
+          <div class="city_hot">
+            <h2>热门城市</h2>
+            <ul class="clearfix">
+              <li v-for="item in hotList" :key="item.id" @tap="toCityHandler(item.nm, item.id)">{{ item.nm }}</li>
+            </ul>
+          </div>
+          <div class="city_sort" ref="city_sort">
+            <div v-for="item in cityList" :key="item.index">
+              <h2>{{ item.index }}</h2>
+              <ul>
+                <li v-for="itemList in item.list" :key="itemList.id" @tap="toCityHandler(itemList.nm, itemList.id)">
+                  {{ itemList.nm }}
+                </li>
+              </ul>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
+    </Scroller>
 
     <div class="city_index">
       <ul>
@@ -36,18 +41,36 @@ export default {
   data() {
     return {
       cityList: [],
-      hotList: []
+      hotList: [],
+      isFinish: false,
+      isLoading: true
     }
   },
 
   mounted() {
-    this.axios.get('/dianying/cities.json').then(
-      res => {
-        var { cityList, hotList } = this.formatCityList(res.data.cts)
+    var cityList = window.localStorage.getItem('cityList')
+    var hotList = window.localStorage.getItem('hotList')
 
-        this.cityList = cityList
-        this.hotList = hotList
-      })
+    if (cityList && hotList) {
+      this.cityList = JSON.parse(cityList)
+      this.hotList = JSON.parse(hotList)
+      this.isLoading = false
+    } else {
+      this.axios.get('/dianying/cities.json').then(
+        res => {
+          var { cityList, hotList } = this.formatCityList(res.data.cts)
+
+          this.cityList = cityList
+          this.hotList = hotList
+          this.isLoading = false
+          window.localStorage.setItem('cityList', JSON.stringify(cityList))
+          window.localStorage.setItem('hotList', JSON.stringify(hotList))
+        })
+    }
+
+    this.$nextTick(() => {
+      this.isFinish = true
+    })
   },
 
   methods: {
@@ -89,9 +112,16 @@ export default {
 
     toIndexHandler(index) {
       var oH2 = this.$refs.city_sort.getElementsByTagName("h2")
-      this.$refs.city_sort.parentElement.scrollTop = oH2[index].offsetTop
-    }
+      // this.$refs.city_sort.parentElement.scrollTop = oH2[index].offsetTop
+      this.$refs.city_list.toScrollTop(-oH2[index].offsetTop)
+    },
 
+    toCityHandler(cityName, cityId) {
+      this.$store.commit('city/CITY_INFO', { cityName, cityId })
+      window.localStorage.setItem('cityName', cityName)
+      window.localStorage.setItem('cityId', cityId)
+      this.$router.push('/movie/nowPlaying')
+    }
   }
 }
 </script>

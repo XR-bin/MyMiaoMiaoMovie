@@ -1,19 +1,22 @@
 <template>
   <div class="movie_body">
-    <ul>
-      <li v-for="item in comingList" :key="item.id">
-        <div class="pic_show"><img :src="item.img | setWH('128.180')"></div>
-          <div class="info_list">
-            <h2>{{ item.nm }}<img v-if="item.version" src="../../assets/maxs.png"></h2>
-              <p><span class="grade">{{ item.wish }}</span> 人想看</p>
-              <p>主演: {{ item.star }}</p>
-              <p>{{ item.showInfo }}</p>
-        </div>
-        <div class="btn_mall">
-          预售
-        </div>
-      </li>
-    </ul>
+    <Loading v-if="isLoading" />
+    <Scroller v-else :isFinish="isFinish">
+      <ul>
+        <li v-for="item in comingList" :key="item.id">
+          <div class="pic_show"><img :src="item.img | setWH('128.180')"></div>
+            <div class="info_list">
+              <h2>{{ item.nm }}<img v-if="item.version" src="../../assets/maxs.png"></h2>
+                <p><span class="grade">{{ item.wish }}</span> 人想看</p>
+                <p>主演: {{ item.star }}</p>
+                <p>{{ item.showInfo }}</p>
+          </div>
+          <div class="btn_mall">
+            预售
+          </div>
+        </li>
+      </ul>
+    </Scroller>
   </div>
 </template>
 
@@ -23,7 +26,9 @@ export default {
 
   data() {
     return {
-      comingList: []
+      comingList: [],
+      isFinish: false,
+      isLoading: true
     }
   },
 
@@ -31,6 +36,10 @@ export default {
     this.axios.get("ajax/comingList?ci=20&token=&limit=10&optimus_uuid=A56D8830F66911EBA425CFF8F161357066025D44E0874C4EA5E4EC182D56F2F7&optimus_risk_level=71&optimus_code=10").then(
       res => {
         this.comingList = res.data.coming
+        this.isLoading = false
+        this.$nextTick(() => {
+          this.isFinish = true
+        })
       }
     )
   }
