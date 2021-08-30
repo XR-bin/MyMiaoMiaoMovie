@@ -1,20 +1,24 @@
 <template>
-  <div class="movie_body">
-    <ul>
-      <li v-for="item in movieList" :key="item.id">
-        <div class="pic_show"><img :src="item.img | setWH('128.180')"></div>
-          <div class="info_list">
-            <h2>{{ item.nm }}<img v-if="item.version" src="../../assets/maxs.png"></h2>
-            <p>观众评 <span class="grade">{{ item.sc }}</span></p>
-            <p>主演: {{ item.star }}</p>
-            <p>{{ item.showInfo }}</p>
-        </div>
-        <div class="btn_mall">
-          <div v-if="item.globalReleased">购票</div>
-          <div v-else style="background-color: #3C9FE6; border-radius: 4px;">预售</div>
-        </div>
-      </li>
-    </ul>
+  <div class="movie_body" ref="movie_body">
+    <Loading v-if="isLoading" />
+    <Scroller v-else :isFinish="isFinish" :toScrollHandler='toScrollHandler' :toTouchEndHandler='toTouchEndHandler'>
+      <ul>
+        <li class="scroll_down">{{ pullDownMsg }}</li>
+        <li v-for="item in movieList" :key="item.id">
+          <div class="pic_show"><img :src="item.img | setWH('128.180')"></div>
+            <div class="info_list">
+              <h2>{{ item.nm }}<img v-if="item.version" src="../../assets/maxs.png"></h2>
+              <p>观众评 <span class="grade">{{ item.sc }}</span></p>
+              <p>主演: {{ item.star }}</p>
+              <p>{{ item.showInfo }}</p>
+          </div>
+          <div class="btn_mall">
+            <div v-if="item.globalReleased">购票</div>
+            <div v-else style="background-color: #3C9FE6; border-radius: 4px;">预售</div>
+          </div>
+        </li>
+      </ul>
+    </Scroller>
   </div>
 </template>
 
@@ -24,7 +28,32 @@ export default {
 
   data() {
     return {
-      movieList: []
+      movieList: [],
+      isFinish: false,
+      pullDownMsg: '',
+      isLoading: true
+    }
+  },
+
+  methods: {
+    toScrollHandler(pos) {
+      if (pos.y > 30) {
+        this.pullDownMsg = '正在更新中'
+      }
+    },
+
+    toTouchEndHandler(pos) {
+      if (pos.y > 30) {
+        this.axios.get("ajax/movieOnInfoList?token=&optimus_uuid=A56D8830F66911EBA425CFF8F161357066025D44E0874C4EA5E4EC182D56F2F7&optimus_risk_level=71&optimus_code=10").then(
+          res => {
+            this.pullDownMsg = '更新成功'
+            setTimeout(() => {
+              this.movieList = res.data.movieList
+              this.pullDownMsg = ''
+            }, 1000)
+          }
+        )
+      }
     }
   },
 
@@ -32,6 +61,10 @@ export default {
     this.axios.get("ajax/movieOnInfoList?token=&optimus_uuid=A56D8830F66911EBA425CFF8F161357066025D44E0874C4EA5E4EC182D56F2F7&optimus_risk_level=71&optimus_code=10").then(
       res => {
         this.movieList = res.data.movieList
+        this.isLoading = false
+        this.$nextTick(() => {
+          this.isFinish = true
+        })
       }
     )
   }
@@ -51,4 +84,6 @@ export default {
   .movie_body .info_list img{ width:50px; position: absolute; right:10px; top: 5px;}
   .movie_body .btn_mall , .movie_body .btn_pre{ width:47px; height:27px; line-height: 28px; text-align: center; background-color: #f03d37; color: #fff; border-radius: 4px; font-size: 12px; cursor: pointer;}
   .movie_body .btn_pre{ background-color: #3c9fe6;}
+
+  .movie_body .scroll_down{ margin: 0;padding: 0; border: none; text-align: center;display: block;}
 </style>

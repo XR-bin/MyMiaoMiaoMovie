@@ -1,23 +1,26 @@
 <template>
   <div class="cinema_body">
-    <ul>
-      <li v-for="item in cinemaList" :key="item.id">
-        <div>
-          <span>{{ item.nm }}</span>
-          <span class="q"><span class="price">{{ item.sellPrice }}</span> 元起</span>
-        </div>
-        <div class="address">
-          <span>{{ item.addr }}</span>
-          <span>{{ item.distance }}</span>
-        </div>
-        <div class="card">
-          <div v-if="item.tag.allowRefund === 1" class="bl">退</div>
-          <div v-if="item.tag.endorse === 1" class="bl">改签</div>
-          <div v-if="item.tag.sell === 1" class="or">小吃</div>
-          <div v-if="item.tag.snack === 1" class="or">折扣卡</div>
-        </div>
-      </li>
-    </ul>
+    <Loading v-if="isLoading" />
+    <Scroller v-else :isFinish="isFinish">
+      <ul>
+        <li v-for="item in cinemaList" :key="item.id">
+          <div>
+            <span>{{ item.nm }}</span>
+            <span class="q"><span class="price">{{ item.sellPrice }}</span> 元起</span>
+          </div>
+          <div class="address">
+            <span>{{ item.addr }}</span>
+            <span>{{ item.distance }}</span>
+          </div>
+          <div class="card">
+            <div v-if="item.tag.allowRefund === 1" class="bl">退</div>
+            <div v-if="item.tag.endorse === 1" class="bl">改签</div>
+            <div v-if="item.tag.sell === 1" class="or">小吃</div>
+            <div v-if="item.tag.snack === 1" class="or">折扣卡</div>
+          </div>
+        </li>
+      </ul>
+    </Scroller>
   </div>
 </template>
 
@@ -27,7 +30,9 @@ export default {
 
   data() {
     return {
-      cinemaList: []
+      cinemaList: [],
+      isFinish: false,
+      isLoading: true
     }
   },
 
@@ -37,6 +42,10 @@ export default {
     this.axios.get(`/ajax/cinemaList?day=${n}&offset=0&limit=20&districtId=-1&lineId=-1&hallType=-1&brandId=-1&serviceId=-1&areaId=-1&stationId=-1&item=&updateShowDay=true&reqId=1630047756731&cityId=20&optimus_uuid=A56D8830F66911EBA425CFF8F161357066025D44E0874C4EA5E4EC182D56F2F7&optimus_risk_level=71&optimus_code=10`).then(
       res => {
         this.cinemaList = res.data.cinemas
+        this.isLoading = false
+        this.$nextTick(() => {
+          this.isFinish = true
+        })
       }
     )
   }
