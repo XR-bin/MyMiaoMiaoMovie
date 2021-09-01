@@ -28,15 +28,26 @@ export default {
     return {
       comingList: [],
       isFinish: false,
-      isLoading: true
+      isLoading: true,
+      prevCity: -1
     }
   },
 
-  mounted() {
-    this.axios.get("ajax/comingList?ci=20&token=&limit=10&optimus_uuid=A56D8830F66911EBA425CFF8F161357066025D44E0874C4EA5E4EC182D56F2F7&optimus_risk_level=71&optimus_code=10").then(
+  activated() {
+    var cityId = this.$store.state.city.cityId
+    
+    if (cityId === this.prevCity) {
+      return
+    }
+    
+    this.isLoading = true
+    
+    this.axios.get(`ajax/comingList?ci=20&token=&limit=10&optimus_uuid=A56D8830F66911EBA425CFF8F161357066025D44E0874C4EA5E4EC182D56F2F7&optimus_risk_level=71&optimus_code=10&cityId=${cityId}`).then(
       res => {
         this.comingList = res.data.coming
         this.isLoading = false
+        this.prevCity = cityId
+        
         this.$nextTick(() => {
           this.isFinish = true
         })
