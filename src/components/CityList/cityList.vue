@@ -6,7 +6,7 @@
         <li v-for="item in cinemaList" :key="item.id">
           <div>
             <span>{{ item.nm }}</span>
-            <span class="q"><span class="price">{{ item.sellPrice }}</span> 元起</span>
+            <span class="q"><span class="price"> {{ item.sellPrice }}</span> 元起</span>
           </div>
           <div class="address">
             <span>{{ item.addr }}</span>
@@ -32,17 +32,30 @@ export default {
     return {
       cinemaList: [],
       isFinish: false,
-      isLoading: true
+      isLoading: true,
+      day: '',
+      prevCity: -1
     }
   },
 
   mounted() {
+    var cityId = this.$store.state.city.cityId
     var d = new Date()
     var n = d.toJSON().substr(0, 10)
-    this.axios.get(`/ajax/cinemaList?day=${n}&offset=0&limit=20&districtId=-1&lineId=-1&hallType=-1&brandId=-1&serviceId=-1&areaId=-1&stationId=-1&item=&updateShowDay=true&reqId=1630047756731&cityId=20&optimus_uuid=A56D8830F66911EBA425CFF8F161357066025D44E0874C4EA5E4EC182D56F2F7&optimus_risk_level=71&optimus_code=10`).then(
+
+    if (cityId === this.prevCity || n === this.day) {
+      return
+    }
+
+    this.isLoading = true
+
+    this.axios.get(`/ajax/cinemaList?day=${n}&offset=0&limit=20&districtId=-1&lineId=-1&hallType=-1&brandId=-1&serviceId=-1&areaId=-1&stationId=-1&item=&updateShowDay=true&reqId=1630047756731&cityId=${cityId}&optimus_uuid=A56D8830F66911EBA425CFF8F161357066025D44E0874C4EA5E4EC182D56F2F7&optimus_risk_level=71&optimus_code=10`).then(
       res => {
         this.cinemaList = res.data.cinemas
         this.isLoading = false
+        this.prevCity = cityId
+        this.day = n
+
         this.$nextTick(() => {
           this.isFinish = true
         })
