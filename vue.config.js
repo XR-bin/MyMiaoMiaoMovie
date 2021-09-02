@@ -12,6 +12,10 @@ module.exports = {
       '/search*': {
         target: 'https://i.maoyan.com/apollo/ajax',
         changeOrigin: true                         //是否改变传入进来的地址
+      },
+      '/?_lxsdk_rnd': {
+        target: 'https://postreport.meituan.com',
+        changeOrigin: true                         //是否改变传入进来的地址
       }
     }
   }

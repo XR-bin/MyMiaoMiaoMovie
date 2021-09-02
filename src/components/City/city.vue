@@ -68,6 +68,7 @@ export default {
         })
     }
 
+    this.isFinish = false
     this.$nextTick(() => {
       this.isFinish = true
     })
