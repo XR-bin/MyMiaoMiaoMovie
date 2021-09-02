@@ -47,7 +47,7 @@ export default {
         this.comingList = res.data.coming
         this.isLoading = false
         this.prevCity = cityId
-        
+        this.isFinish = false
         this.$nextTick(() => {
           this.isFinish = true
         })

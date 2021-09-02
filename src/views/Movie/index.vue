@@ -28,6 +28,7 @@ import TabBar from '../../components/TabBar/tabBar.vue'
 
 export default {
   name: 'Movie',
+
   components: {
     Header,
     TabBar

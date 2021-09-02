@@ -55,6 +55,7 @@ export default {
         this.isLoading = false
         this.prevCity = cityId
         this.day = n
+        this.isFinish = false
 
         this.$nextTick(() => {
           this.isFinish = true

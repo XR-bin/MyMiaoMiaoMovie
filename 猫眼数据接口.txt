@@ -19,5 +19,6 @@
 	http://m.maoyan.com/ajax/cinemaList?day=2021-08-27&offset=0&limit=20&districtId=-1&lineId=-1&hallType=-1&brandId=-1&serviceId=-1&areaId=-1&stationId=-1&item=&updateShowDay=true&reqId=1630047756731&cityId=20&optimus_uuid=A56D8830F66911EBA425CFF8F161357066025D44E0874C4EA5E4EC182D56F2F7&optimus_risk_level=71&optimus_code=10
 
 定位数据接口---post
-	https://postreport.meituan.com/?_lxsdk_rnd=17ba070fff50
-	【注】这里好像只有手机端有用，电脑端没法定位到
+	https://postreport.meituan.com
+	【注】这里好像只有手机端有用，可能我电脑太旧了，电脑端没法定位到
+	【注】这个接口我没有用在项目中，如果需要请自行配置

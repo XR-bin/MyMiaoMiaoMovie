@@ -72,6 +72,7 @@ export default {
         this.movieList = res.data.movieList
         this.isLoading = false
         this.prevCity = cityId
+        this.isFinish = false
         this.$nextTick(() => {
           this.isFinish = true
         })
