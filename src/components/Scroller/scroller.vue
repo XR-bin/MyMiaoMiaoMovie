@@ -1,5 +1,5 @@
 <template>
-  <div class="wrapper" ref="wrapper">
+  <div class="wrapper">
     <slot></slot>
   </div>
 </template>
@@ -10,11 +10,6 @@ import Bscroll from 'better-scroll'
 export default {
   name: 'scroller',
   props: {
-    isFinish: {
-      type: Boolean,
-      default: false
-    },
-
     toScrollHandler: {
       type: Function,
       default: function() {}
@@ -26,28 +21,23 @@ export default {
     }
   },
 
-  // 每次isFinish改变都会触发
-  watch: {
-    isFinish(is) {
-      if (is === true) {
-        var oScroll = new Bscroll(this.$refs.wrapper, {
-          tap: 'tap',
-          probeType: 1
-        })
-        
-        this.scroll = oScroll
+  mounted() {
+    var oScroll = new Bscroll('.wrapper', {
+      tap: 'tap',
+      probeType: 1
+    })
 
-        oScroll.on('scroll', (pos) => {
-          this.toScrollHandler(pos)
-        })
+    this.scroll = oScroll
 
-        oScroll.on('touchEnd', (pos) => {
-          this.toTouchEndHandler(pos)
-        })
-      }
-    }
+    oScroll.on('scroll', (pos) => {
+      this.toScrollHandler(pos)
+    })
+
+    oScroll.on('touchEnd', (pos) => {
+      this.toTouchEndHandler(pos)
+    })
   },
-  
+
   methods: {
     toScrollTop(y) {
       this.scroll.scrollTo(0, y)

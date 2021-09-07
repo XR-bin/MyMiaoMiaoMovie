@@ -1,49 +1,55 @@
 <template>
-  <div class="cinema_body">
-    <Loading v-if="isLoading" />
-    <Scroller v-else :isFinish="isFinish">
-      <ul>
-        <li v-for="item in cinemaList" :key="item.id">
-          <div>
-            <span>{{ item.nm }}</span>
-            <span class="q"><span class="price"> {{ item.sellPrice }}</span> 元起</span>
-          </div>
-          <div class="address">
-            <span>{{ item.addr }}</span>
-            <span>{{ item.distance }}</span>
-          </div>
-          <div class="card">
-            <div v-if="item.tag.allowRefund === 1" class="bl">退</div>
-            <div v-if="item.tag.endorse === 1" class="bl">改签</div>
-            <div v-if="item.tag.sell === 1" class="or">小吃</div>
-            <div v-if="item.tag.snack === 1" class="or">折扣卡</div>
-          </div>
-        </li>
-      </ul>
-    </Scroller>
+  <Loading v-if="isLoading" />
+  <div class="cinema_body" v-else>
+    <ul>
+      <li v-for="item in cinemaList" :key="item.id">
+        <div>
+          <span>{{ item.nm }}</span>
+          <span class="q"><span class="price"> {{ item.sellPrice }}</span> 元起</span>
+        </div>
+        <div class="address">
+          <span>{{ item.addr }}</span>
+          <span>{{ item.distance }}</span>
+        </div>
+        <div class="card">
+          <div v-if="item.tag.allowRefund === 1" class="bl">退</div>
+          <div v-if="item.tag.endorse === 1" class="bl">改签</div>
+          <div v-if="item.tag.sell === 1" class="or">小吃</div>
+          <div v-if="item.tag.snack === 1" class="or">折扣卡</div>
+        </div>
+      </li>
+    </ul>
   </div>
 </template>
 
 <script>
+import Bscroll from 'better-scroll'
+
 export default {
   name: "CityList",
 
   data() {
     return {
       cinemaList: [],
-      isFinish: false,
       isLoading: true,
       day: '',
       prevCity: -1
     }
   },
 
-  mounted() {
+  activated() {
     var cityId = this.$store.state.city.cityId
     var d = new Date()
     var n = d.toJSON().substr(0, 10)
 
-    if (cityId === this.prevCity || n === this.day) {
+    if (cityId === this.prevCity && n === this.day) {
+      if (this.scroll.hasVerticalScroll === false) {
+        this.scroll = new Bscroll('.cinema_body', {
+          tap: 'tap',
+          probeType: 1
+        })
+      }
+
       return
     }
 
@@ -55,10 +61,12 @@ export default {
         this.isLoading = false
         this.prevCity = cityId
         this.day = n
-        this.isFinish = false
 
         this.$nextTick(() => {
-          this.isFinish = true
+          this.scroll = new Bscroll('.cinema_body', {
+            tap: 'tap',
+            probeType: 1
+          })
         })
       }
     )

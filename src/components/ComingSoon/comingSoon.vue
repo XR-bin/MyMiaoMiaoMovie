@@ -1,12 +1,11 @@
 <template>
-  <div class="movie_body">
-    <Loading v-if="isLoading" />
-    <Scroller v-else :isFinish="isFinish">
+  <Loading v-if="isLoading" />
+  <div class="movie_body" v-else>
       <ul>
         <li v-for="item in comingList" :key="item.id">
-          <div class="pic_show"><img :src="item.img | setWH('128.180')"></div>
+          <div class="pic_show" @tap="toDetailHandler(item.id)"><img :src="item.img | setWH('128.180')"></div>
             <div class="info_list">
-              <h2>{{ item.nm }}<img v-if="item.version" src="../../assets/maxs.png"></h2>
+              <h2 @tap="toDetailHandler(item.id)">{{ item.nm }}<img v-if="item.version" src="../../assets/maxs.png"></h2>
                 <p><span class="grade">{{ item.wish }}</span> 人想看</p>
                 <p>主演: {{ item.star }}</p>
                 <p>{{ item.showInfo }}</p>
@@ -16,18 +15,18 @@
           </div>
         </li>
       </ul>
-    </Scroller>
   </div>
 </template>
 
 <script>
+import Bscroll from 'better-scroll'
+
 export default {
   name: "ComingSoon",
 
   data() {
     return {
       comingList: [],
-      isFinish: false,
       isLoading: true,
       prevCity: -1
     }
@@ -35,24 +34,40 @@ export default {
 
   activated() {
     var cityId = this.$store.state.city.cityId
-    
+
     if (cityId === this.prevCity) {
+      if (this.scroll.hasVerticalScroll === false) {
+        this.scroll = new Bscroll('.movie_body', {
+          tap: 'tap',
+          probeType: 1
+        })
+      }
+
       return
     }
-    
+
     this.isLoading = true
-    
+
     this.axios.get(`ajax/comingList?ci=20&token=&limit=10&optimus_uuid=A56D8830F66911EBA425CFF8F161357066025D44E0874C4EA5E4EC182D56F2F7&optimus_risk_level=71&optimus_code=10&cityId=${cityId}`).then(
       res => {
         this.comingList = res.data.coming
         this.isLoading = false
         this.prevCity = cityId
-        this.isFinish = false
+
         this.$nextTick(() => {
-          this.isFinish = true
+          this.scroll = new Bscroll('.movie_body', {
+            tap: 'tap',
+            probeType: 1
+          })
         })
       }
     )
+  },
+
+  methods: {
+    toDetailHandler(movieId) {
+      this.$router.push(`/movie/detail/2/${movieId}`)
+    }
   }
 }
 </script>

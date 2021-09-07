@@ -1,28 +1,26 @@
 <template>
-  <div class="city_body">
-    <Loading v-if="isLoading" />
-    <Scroller v-else :isFinish="isFinish" ref="city_list">
-      <div>
-        <div class="city_list">
-          <div class="city_hot">
-            <h2>热门城市</h2>
-            <ul class="clearfix">
-              <li v-for="item in hotList" :key="item.id" @tap="toCityHandler(item.nm, item.id)">{{ item.nm }}</li>
+  <Loading v-if="isLoading" />
+  <div class="city_body" v-else>
+    <div class="city_div">
+      <div class="city_list">
+        <div class="city_hot">
+          <h2>热门城市</h2>
+          <ul class="clearfix">
+            <li v-for="item in hotList" :key="item.id" @tap="toCityHandler(item.nm, item.id)">{{ item.nm }}</li>
+          </ul>
+        </div>
+        <div class="city_sort" ref="city_sort">
+          <div v-for="item in cityList" :key="item.index">
+            <h2>{{ item.index }}</h2>
+            <ul>
+              <li v-for="itemList in item.list" :key="itemList.id" @tap="toCityHandler(itemList.nm, itemList.id)">
+                {{ itemList.nm }}
+              </li>
             </ul>
-          </div>
-          <div class="city_sort" ref="city_sort">
-            <div v-for="item in cityList" :key="item.index">
-              <h2>{{ item.index }}</h2>
-              <ul>
-                <li v-for="itemList in item.list" :key="itemList.id" @tap="toCityHandler(itemList.nm, itemList.id)">
-                  {{ itemList.nm }}
-                </li>
-              </ul>
-            </div>
           </div>
         </div>
       </div>
-    </Scroller>
+    </div>
 
     <div class="city_index">
       <ul>
@@ -35,6 +33,8 @@
 </template>
 
 <script>
+import Bscroll from 'better-scroll'
+
 export default {
   name: "City",
 
@@ -42,7 +42,6 @@ export default {
     return {
       cityList: [],
       hotList: [],
-      isFinish: false,
       isLoading: true
     }
   },
@@ -55,6 +54,13 @@ export default {
       this.cityList = JSON.parse(cityList)
       this.hotList = JSON.parse(hotList)
       this.isLoading = false
+
+      this.$nextTick(() => {
+        this.scroll = new Bscroll('.city_div', {
+          tap: 'tap',
+          probeType: 1
+        })
+      })
     } else {
       this.axios.get('/dianying/cities.json').then(
         res => {
@@ -65,13 +71,15 @@ export default {
           this.isLoading = false
           window.localStorage.setItem('cityList', JSON.stringify(cityList))
           window.localStorage.setItem('hotList', JSON.stringify(hotList))
+
+          this.$nextTick(() => {
+            this.scroll = new Bscroll('.city_div', {
+              tap: 'tap',
+              probeType: 1
+            })
+          })
         })
     }
-
-    this.isFinish = false
-    this.$nextTick(() => {
-      this.isFinish = true
-    })
   },
 
   methods: {
@@ -114,7 +122,8 @@ export default {
     toIndexHandler(index) {
       var oH2 = this.$refs.city_sort.getElementsByTagName("h2")
       // this.$refs.city_sort.parentElement.scrollTop = oH2[index].offsetTop
-      this.$refs.city_list.toScrollTop(-oH2[index].offsetTop)
+      // this.$refs.city_list.toScrollTop(-oH2[index].offsetTop)
+      this.scroll.scrollTo(0, -oH2[index].offsetTop)
     },
 
     toCityHandler(cityName, cityId) {
@@ -122,6 +131,16 @@ export default {
       window.localStorage.setItem('cityName', cityName)
       window.localStorage.setItem('cityId', cityId)
       this.$router.push('/movie/nowPlaying')
+    }
+  },
+
+  activated() {
+    if (this.scroll) {
+      if (this.scroll.hasVerticalScroll === false) {
+        this.scroll = new Bscroll('.city_div', {
+          probeType: 1
+        })
+      }
     }
   }
 }
@@ -141,5 +160,5 @@ export default {
   .city_body .city_sort h2{ padding-left: 15px; line-height: 30px; font-size: 14px; background:#F0F0F0; font-weight: normal;}
   .city_body .city_sort ul{ padding-left: 10px; margin-top: 10px;}
   .city_body .city_sort ul li{ line-height: 30px; line-height: 30px;}
-  .city_body .city_index{ width:20px; display: flex; flex-direction:column; justify-content:center; text-align: center; border-left:1px #e6e6e6 solid;}
+  .city_body .city_index{ font-size: 14px; width:24px; display: flex; flex-direction:column; justify-content:center; text-align: center; border-left:1px #e6e6e6 solid;}
 </style>

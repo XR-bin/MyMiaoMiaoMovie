@@ -1,35 +1,34 @@
 <template>
-  <div class="movie_body" ref="movie_body">
-    <Loading v-if="isLoading" />
-    <Scroller v-else :isFinish="isFinish" :toScrollHandler='toScrollHandler' :toTouchEndHandler='toTouchEndHandler'>
-      <ul>
-        <li class="scroll_down">{{ pullDownMsg }}</li>
-        <li v-for="item in movieList" :key="item.id">
-          <div class="pic_show"><img :src="item.img | setWH('128.180')"></div>
-            <div class="info_list">
-              <h2>{{ item.nm }}<img v-if="item.version" src="../../assets/maxs.png"></h2>
-              <p>观众评 <span class="grade">{{ item.sc }}</span></p>
-              <p>主演: {{ item.star }}</p>
-              <p>{{ item.showInfo }}</p>
-          </div>
-          <div class="btn_mall">
-            <div v-if="item.globalReleased">购票</div>
-            <div v-else style="background-color: #3C9FE6; border-radius: 4px;">预售</div>
-          </div>
-        </li>
-      </ul>
-    </Scroller>
+  <Loading v-if="isLoading" />
+  <div class="movie_body" v-else>
+    <ul>
+      <li class="scroll_down">{{ pullDownMsg }}</li>
+      <li v-for="item in movieList" :key="item.id">
+        <div class="pic_show" @tap="toDetailHandler(item.id)"><img :src="item.img | setWH('128.180')"></div>
+          <div class="info_list">
+            <h2 @tap="toDetailHandler(item.id)">{{ item.nm }}<img v-if="item.version" src="../../assets/maxs.png"></h2>
+            <p>观众评 <span class="grade">{{ item.sc }}</span></p>
+            <p>主演: {{ item.star }}</p>
+            <p>{{ item.showInfo }}</p>
+        </div>
+        <div class="btn_mall">
+          <div v-if="item.globalReleased">购票</div>
+          <div v-else style="background-color: #3C9FE6; border-radius: 4px;">预售</div>
+        </div>
+      </li>
+    </ul>
   </div>
 </template>
 
 <script>
+import Bscroll from 'better-scroll'
+
 export default {
   name: "NowPlaying",
 
   data() {
     return {
       movieList: [],
-      isFinish: false,
       pullDownMsg: '',
       isLoading: true,
       prevCity: -1
@@ -37,6 +36,10 @@ export default {
   },
 
   methods: {
+    toDetailHandler(movieId) {
+      this.$router.push(`/movie/detail/1/${movieId}`)
+    },
+
     toScrollHandler(pos) {
       if (pos.y > 30) {
         this.pullDownMsg = '正在更新中'
@@ -62,6 +65,21 @@ export default {
     var cityId = this.$store.state.city.cityId
 
     if (cityId === this.prevCity) {
+      if (this.scroll.hasVerticalScroll === false) {
+        this.scroll = new Bscroll('.movie_body', {
+          tap: 'tap',
+          probeType: 1
+        })
+        
+        this.scroll.on('scroll', (pos) => {
+          this.toScrollHandler(pos)
+        })
+        
+        this.scroll.on('touchEnd', (pos) => {
+          this.toTouchEndHandler(pos)
+        })
+      }
+
       return
     }
 
@@ -72,9 +90,20 @@ export default {
         this.movieList = res.data.movieList
         this.isLoading = false
         this.prevCity = cityId
-        this.isFinish = false
+
         this.$nextTick(() => {
-          this.isFinish = true
+          this.scroll = new Bscroll('.movie_body', {
+            tap: 'tap',
+            probeType: 1
+          })
+
+          this.scroll.on('scroll', (pos) => {
+            this.toScrollHandler(pos)
+          })
+
+          this.scroll.on('touchEnd', (pos) => {
+            this.toTouchEndHandler(pos)
+          })
         })
       }
     )
