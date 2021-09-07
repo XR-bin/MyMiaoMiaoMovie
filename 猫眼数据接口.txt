@@ -1,13 +1,20 @@
+
 城市数据接口(这接口我废了好久就才找到的)---get：
 	https://m.maoyan.com/dianying/cities.json
+
+
 
 正在热映的数据接口---get：
 	https://m.maoyan.com/ajax/movieOnInfoList?token=&optimus_uuid=A56D8830F66911EBA425CFF8F161357066025D44E0874C4EA5E4EC182D56F2F7&optimus_risk_level=71&optimus_code=10&cityId=20
 	cityId=20                                      //cityId是城市id，20表示的是广州id，id值可在城市数据接口里获得
 
+
+
 即将上映的数据接口---get
 	https://m.maoyan.com/ajax/comingList?ci=20&token=&limit=10&optimus_uuid=A56D8830F66911EBA425CFF8F161357066025D44E0874C4EA5E4EC182D56F2F7&optimus_risk_level=71&optimus_code=10&cityId=20
 	cityId=20                                      //cityId是城市id，20表示的是广州id，id值可在城市数据接口里获得
+
+
 
 搜索的数据接口---get
 	https://i.maoyan.com/apollo/ajax/search?kw=%E6%80%92%E7%81%AB&cityId=20&stype=-1
@@ -15,10 +22,20 @@
 	【注】kw=%E6%80%92%E7%81%AB      //kw表示搜索关键字   它乱码是因为编码格式的问题，复制到浏览器上就能看到搜索关键字是怒火(%E6%80%92%E7%81%AB)
 	         cityId=20                                      //cityId是城市id，20表示的是广州id，id值可在城市数据接口里获得
 
+
+
 影院列表数据接口---get
 	http://m.maoyan.com/ajax/cinemaList?day=2021-08-27&offset=0&limit=20&districtId=-1&lineId=-1&hallType=-1&brandId=-1&serviceId=-1&areaId=-1&stationId=-1&item=&updateShowDay=true&reqId=1630047756731&cityId=20&optimus_uuid=A56D8830F66911EBA425CFF8F161357066025D44E0874C4EA5E4EC182D56F2F7&optimus_risk_level=71&optimus_code=10
+
+
 
 定位数据接口---post
 	https://postreport.meituan.com
 	【注】这里好像只有手机端有用，可能我电脑太旧了，电脑端没法定位到
 	【注】这个接口我没有用在项目中，如果需要请自行配置
+
+
+
+电影详细页面数据接口---get
+	https://m.maoyan.com/api/mtrade/mmdb/movie/v5/1218188.json?optimus_uuid=82FB53800BC311ECA1BA4199AE1F357F0BCA53C0FEC44A95B8CE794C88CE9F35&optimus_risk_level=71&optimus_code=10
+
